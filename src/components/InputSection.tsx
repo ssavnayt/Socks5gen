@@ -119,13 +119,20 @@ export const InputSection: React.FC<InputSectionProps> = ({
           throw new Error(errData.error || `Ошибка сервера (${proxyRes.status})`);
         }
       } catch (serverErr: any) {
-        // Fallback: direct fetch if allowed by CORS
+        // Fallback 1: direct fetch
         try {
           const directRes = await fetch(target);
           if (!directRes.ok) throw new Error(`HTTP ${directRes.status}`);
           fetchedText = await directRes.text();
         } catch {
-          throw new Error(serverErr.message || 'Не удалось получить данные по указанной ссылке');
+          // Fallback 2: public CORS proxy (when running on static GitHub Pages)
+          try {
+            const corsRes = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`);
+            if (!corsRes.ok) throw new Error(`HTTP ${corsRes.status}`);
+            fetchedText = await corsRes.text();
+          } catch {
+            throw new Error(serverErr.message || 'Не удалось получить данные по указанной ссылке');
+          }
         }
       }
 

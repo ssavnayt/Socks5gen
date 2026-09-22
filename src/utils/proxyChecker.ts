@@ -80,6 +80,11 @@ export async function startServerCheckJob(
     body: JSON.stringify({ proxies, timeoutMs }),
   });
   if (!res.ok) {
+    if (res.status === 404) {
+      throw new Error(
+        'Функция проверки пинга через сетевые сокеты требует серверного Node.js бэкенда (на статическом GitHub Pages недоступна). Конвертация, дедупликация и экспорт работают на 100% локально!'
+      );
+    }
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || `Ошибка запуска задачи (${res.status})`);
   }
@@ -95,6 +100,21 @@ export async function pollServerCheckJob(
 ): Promise<JobStatusResponse> {
   const res = await fetch(`/api/check-job/status?cursor=${cursor}&limit=${limit}`);
   if (!res.ok) {
+    if (res.status === 404) {
+      return {
+        jobId: '',
+        status: 'idle',
+        total: 0,
+        completed: 0,
+        onlineCount: 0,
+        offlineCount: 0,
+        startedAt: 0,
+        updatedAt: 0,
+        cursor: 0,
+        newResults: [],
+        hasMore: false,
+      };
+    }
     throw new Error(`Ошибка опроса статуса (${res.status})`);
   }
   return res.json();
@@ -127,6 +147,15 @@ export interface JobAllResultsResponse {
 export async function fetchAllServerJobResults(): Promise<JobAllResultsResponse> {
   const res = await fetch('/api/check-job/all-results');
   if (!res.ok) {
+    if (res.status === 404) {
+      return {
+        jobId: '',
+        status: 'idle',
+        total: 0,
+        completed: 0,
+        results: [],
+      };
+    }
     throw new Error(`Ошибка получения результатов (${res.status})`);
   }
   return res.json();
