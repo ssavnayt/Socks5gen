@@ -1,0 +1,6 @@
+{
+  "name": "SOCKS5 URI Converter",
+  "description": "Преобразователь прокси SOCKS5 из формата IP:port:user:pass в URI (socks5://) с пакетной обработкой, загрузкой по ссылке, дедупликацией, проверкой пинга и геолокации без лимитов, экспортом в V2Ray (socks://...#🇫🇮Страна - Пинг), TXT, CSV, JSON и разделением на части в ZIP.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
